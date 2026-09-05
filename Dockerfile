@@ -11,7 +11,7 @@ ENV APP_HOST=0.0.0.0
 ENV APP_PORT=8080
 ENV DATABASE_URL=sqlite:////data/nihon.db
 
-
+'volume': 
 
 EXPOSE 8080
 
