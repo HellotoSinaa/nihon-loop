@@ -1,12 +1,12 @@
 {
   "services": {
     "nihon-loop": {
-      "volumes": [
-        {
-          "name": "data",
-          "mountPath": "/data"
+      "volumes": {
+        "data": {
+          "mountPath": "/data",
+          "sizeMB": 1024
         }
-      ]
+      }
     }
   }
 }
