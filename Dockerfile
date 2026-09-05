@@ -9,7 +9,7 @@ COPY app ./app
 
 ENV APP_HOST=0.0.0.0
 ENV APP_PORT=8080
-ENV DATABASE_URL=sqlite:////data/nihon.db
+ENV DATABASE_URL=sqlite:///./data/nihon.db
 
 
 
