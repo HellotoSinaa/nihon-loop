@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Nihon Loop — nihon.chatbot</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 680px; margin: 40px auto; padding: 0 16px; background: #0e0e10; color: #eee; }
+  h1 { font-size: 1.2rem; }
+  #log { border: 1px solid #333; border-radius: 8px; padding: 12px; height: 420px; overflow-y: auto; background: #17171a; }
+  .msg { margin: 8px 0; white-space: pre-wrap; }
+  .user { color: #7dd3fc; }
+  .agent { color: #a3e635; }
+  .meta { color: #888; font-size: 0.8rem; }
+  form { display: flex; gap: 8px; margin-top: 12px; }
+  input[type=text] { flex: 1; padding: 8px; border-radius: 6px; border: 1px solid #333; background: #17171a; color: #eee; }
+  button { padding: 8px 16px; border-radius: 6px; border: none; background: #7dd3fc; cursor: pointer; }
+</style>
+</head>
+<body>
+<h1>Nihon Loop — nihon.chatbot</h1>
+<p class="meta">Try: <code>new system: my-project</code>, then <code>new cycle: fix the flaky test</code>, <code>done 5 30 1 notes: retried twice</code>, <code>check</code>, <code>accept</code>. Type <code>help</code> any time.</p>
+<div id="log"></div>
+<form id="chat-form">
+  <input type="text" id="message" placeholder="Type a message..." autocomplete="off" />
+  <button type="submit">Send</button>
+</form>
+<script>
+  let systemId = localStorage.getItem("nihon_system_id") || null;
+  const log = document.getElementById("log");
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("message");
+
+  function append(role, text) {
+    const div = document.createElement("div");
+    div.className = "msg " + role;
+    div.textContent = (role === "user" ? "you: " : "nihon: ") + text;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+    append("user", message);
+    input.value = "";
+    try {
+      const resp = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ system_id: systemId, message, channel: "web" }),
+      });
+      const data = await resp.json();
+      if (data.system_id) {
+        systemId = data.system_id;
+        localStorage.setItem("nihon_system_id", systemId);
+      }
+      append("agent", data.reply + "\n[" + data.phase + "] next: " + data.next_action);
+    } catch (err) {
+      append("agent", "error talking to server: " + err);
+    }
+  });
+</script>
+</body>
+</html>

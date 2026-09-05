@@ -1,0 +1,21 @@
+services:
+  nihon-loop:
+    build: .
+    image: nihon-loop:latest
+    ports:
+      - "8080:8080"
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8080
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://YOUR-DEPLOY-HOST}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      POWERLOBSTER_WEBHOOK_SECRET: ${POWERLOBSTER_WEBHOOK_SECRET:-}
+      DATABASE_URL: sqlite:////data/nihon.db
+    volumes:
+      - nihon-data:/data
+    restart: unless-stopped
+
+volumes:
+  nihon-data:
